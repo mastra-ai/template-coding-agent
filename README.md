@@ -20,7 +20,7 @@ This template demonstrates how to build an AI coding assistant that can work wit
 
 - Node.js 20 or higher
 - E2B API key (sign up at [e2b.dev](https://e2b.dev))
-- OpenAI API key
+- Google API key
 
 ## Setup
 
@@ -41,7 +41,7 @@ This template demonstrates how to build an AI coding assistant that can work wit
 
    ```env
    E2B_API_KEY="your-e2b-api-key-here"
-   OPENAI_API_KEY="your-openai-api-key-here"
+   GOOGLE_GENERATIVE_AI_API_KEY="your-openai-api-key-here"
    ```
 
 3. **Start the development server:**
@@ -114,7 +114,7 @@ The agent includes a configured memory system:
 
 ```bash
 E2B_API_KEY=your_e2b_api_key_here
-OPENAI_API_KEY=your_openai_api_key_here
+GOOGLE_GENERATIVE_AI_API_KEY=your_openai_api_key_here
 ```
 
 ### Customization
