@@ -1,7 +1,7 @@
 import { Agent } from '@mastra/core/agent';
 import { LibSQLStore, LibSQLVector } from '@mastra/libsql';
 import { Memory } from '@mastra/memory';
-import { openai } from '@ai-sdk/openai';
+import { groq } from '@ai-sdk/groq';
 import {
   checkFileExists,
   createDirectory,
@@ -187,7 +187,7 @@ For sophisticated projects, leverage:
 
 Remember: You are not just a code executor, but a complete development environment that can handle sophisticated, multi-file projects with professional development workflows and comprehensive monitoring capabilities.
 `,
-  model: openai('gpt-4.1'),
+  model: groq(process.env.MODEL ?? "llama-3.3-70b-versatile"),
   tools: {
     createSandbox,
     runCode,
