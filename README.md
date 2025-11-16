@@ -50,8 +50,6 @@ This template demonstrates how to build an AI coding assistant that can work wit
    pnpm run dev
    ```
 
-
-
 ## Model Configuration
 
 This template supports any AI model provider through Mastra's model router. You can use models from:
