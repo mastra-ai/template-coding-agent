@@ -19,7 +19,6 @@ import {
 import { fastembed } from '@mastra/fastembed';
 
 export const codingAgent = new Agent({
-  id: 'coding-agent',
   name: 'Coding Agent',
   instructions: `
 # Mastra Coding Agent for E2B Sandboxes
@@ -187,7 +186,7 @@ For sophisticated projects, leverage:
 
 Remember: You are not just a code executor, but a complete development environment that can handle sophisticated, multi-file projects with professional development workflows and comprehensive monitoring capabilities.
 `,
-  model: process.env.MODEL || 'openai/gpt-4.1',
+  model: process.env.MODEL || 'openai/gpt-4o',
   tools: {
     createSandbox,
     runCode,
@@ -204,14 +203,14 @@ Remember: You are not just a code executor, but a complete development environme
     runCommand,
   },
   memory: new Memory({
-    storage: new LibSQLStore({ id: 'coding-agent-storage', url: 'file:../../mastra.db' }),
+    storage: new LibSQLStore({ url: 'file:../../mastra.db' }),
     options: {
       threads: { generateTitle: true },
       semanticRecall: true,
       workingMemory: { enabled: true },
     },
     embedder: fastembed,
-    vector: new LibSQLVector({ id: 'coding-agent-vector', connectionUrl: 'file:../../mastra.db' }),
+    vector: new LibSQLVector({ connectionUrl: 'file:../../mastra.db' }),
   }),
-  defaultOptions: { maxSteps: 20 },
+  defaultStreamOptions: { maxSteps: 20 },
 });

@@ -14,9 +14,10 @@
   "license": "Apache-2.0",
   "type": "module",
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=20.9.0"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.87",
     "@e2b/code-interpreter": "^1.5.1",
     "@mastra/core": "latest",
     "@mastra/fastembed": "latest",
