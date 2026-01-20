@@ -28,14 +28,14 @@ export const createSandbox = createTool({
         error: z.string(),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ name, labels, language, envVars }) => {
     const daytona = getDaytonaClient();
     try {
       const sandboxParams: CreateSandboxBaseParams = {
-        name: context.name,
-        envVars: context.envVars,
-        labels: context.labels,
-        language: context.language,
+        name,
+        envVars,
+        labels,
+        language,
       };
       const sandbox: Sandbox = await daytona.create(sandboxParams);
 
@@ -72,15 +72,15 @@ export const runCode = createTool({
         error: z.string().describe('The error from a failed execution'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, code, argv, envs, timeoutSeconds }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
+      const sandbox = await getSandboxById(sandboxId);
 
       const codeRunParams = new CodeRunParams();
-      codeRunParams.argv = context.argv ?? [];
-      codeRunParams.env = context.envs ?? {};
+      codeRunParams.argv = argv ?? [];
+      codeRunParams.env = envs ?? {};
 
-      const execution = await sandbox.process.codeRun(context.code, codeRunParams, context.timeoutSeconds);
+      const execution = await sandbox.process.codeRun(code, codeRunParams, timeoutSeconds);
 
       return {
         exitCode: execution.exitCode,
@@ -111,10 +111,10 @@ export const readFile = createTool({
         error: z.string().describe('The error from a failed file read'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, path }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
-      const normalizedPath = normalizeSandboxPath(context.path);
+      const sandbox = await getSandboxById(sandboxId);
+      const normalizedPath = normalizeSandboxPath(path);
 
       const fileBuffer = await sandbox.fs.downloadFile(normalizedPath);
       const fileContent = fileBuffer.toString('utf-8');
@@ -149,12 +149,12 @@ export const writeFile = createTool({
         error: z.string().describe('The error from a failed file write'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, path, content }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
-      const normalizedPath = normalizeSandboxPath(context.path);
+      const sandbox = await getSandboxById(sandboxId);
+      const normalizedPath = normalizeSandboxPath(path);
 
-      const fileToUpload = [createFileUploadFormat(context.content, normalizedPath)];
+      const fileToUpload = [createFileUploadFormat(content, normalizedPath)];
       await sandbox.fs.uploadFiles(fileToUpload);
 
       return {
@@ -193,10 +193,10 @@ export const writeFiles = createTool({
         error: z.string().describe('The error from a failed files write'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, files }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
-      const files = context.files.map(file => ({
+      const sandbox = await getSandboxById(sandboxId);
+      files = files.map(file => ({
         ...file,
         path: normalizeSandboxPath(file.path),
       }));
@@ -240,10 +240,10 @@ export const listFiles = createTool({
         error: z.string().describe('The error from a failed file listing'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, path }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
-      const normalizedPath = normalizeSandboxPath(context.path);
+      const sandbox = await getSandboxById(sandboxId);
+      const normalizedPath = normalizeSandboxPath(path);
 
       const fileList = await sandbox.fs.listFiles(normalizedPath);
 
@@ -282,10 +282,10 @@ export const deleteFile = createTool({
         error: z.string().describe('The error from a failed file deletion'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, path }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
-      const normalizedPath = normalizeSandboxPath(context.path);
+      const sandbox = await getSandboxById(sandboxId);
+      const normalizedPath = normalizeSandboxPath(path);
 
       // Check if the path is a directory
       const fileInfo = await sandbox.fs.getFileDetails(normalizedPath);
@@ -322,10 +322,10 @@ export const createDirectory = createTool({
         error: z.string().describe('The error from a failed directory creation'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, path }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
-      const normalizedPath = normalizeSandboxPath(context.path);
+      const sandbox = await getSandboxById(sandboxId);
+      const normalizedPath = normalizeSandboxPath(path);
 
       await sandbox.fs.createFolder(normalizedPath, '755');
 
@@ -364,10 +364,10 @@ export const getFileInfo = createTool({
         error: z.string().describe('The error from a failed file info request'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, path }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
-      const normalizedPath = normalizeSandboxPath(context.path);
+      const sandbox = await getSandboxById(sandboxId);
+      const normalizedPath = normalizeSandboxPath(path);
 
       const fileInfo = await sandbox.fs.getFileDetails(normalizedPath);
 
@@ -407,10 +407,10 @@ export const checkFileExists = createTool({
         error: z.string().describe('The error from a failed existence check'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, path }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
-      const normalizedPath = normalizeSandboxPath(context.path);
+      const sandbox = await getSandboxById(sandboxId);
+      const normalizedPath = normalizeSandboxPath(path);
 
       try {
         const fileInfo = await sandbox.fs.getFileDetails(normalizedPath);
@@ -458,16 +458,16 @@ export const getFileSize = createTool({
         error: z.string().describe('The error from a failed size check'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, path, humanReadable }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
-      const normalizedPath = normalizeSandboxPath(context.path);
+      const sandbox = await getSandboxById(sandboxId);
+      const normalizedPath = normalizeSandboxPath(path);
 
       const fileInfo = await sandbox.fs.getFileDetails(normalizedPath);
 
       let humanReadableSize: string | undefined;
 
-      if (context.humanReadable) {
+      if (humanReadable) {
         const bytes = fileInfo.size;
         const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
         if (bytes === 0) {
@@ -559,25 +559,20 @@ export const runCommand = createTool({
         error: z.string().describe('The error from a failed command execution'),
       }),
     ),
-  execute: async ({ context }) => {
+  execute: async ({ sandboxId, command, envs, workingDirectory, timeoutSeconds, captureOutput }, context) => {
     try {
-      const sandbox = await getSandboxById(context.sandboxId);
+      const sandbox = await getSandboxById(sandboxId);
 
       const startTime = Date.now();
-      const response = await sandbox.process.executeCommand(
-        context.command,
-        context.workingDirectory,
-        context.envs ?? {},
-        context.timeoutSeconds,
-      );
+      const response = await sandbox.process.executeCommand(command, workingDirectory, envs ?? {}, timeoutSeconds);
 
       const executionTime = Date.now() - startTime;
 
       return {
         success: response.exitCode === 0,
         exitCode: response.exitCode,
-        stdout: context.captureOutput ? response.result : '',
-        command: context.command,
+        stdout: captureOutput ? response.result : '',
+        command,
         executionTime,
       };
     } catch (e) {
