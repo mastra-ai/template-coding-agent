@@ -19,7 +19,7 @@ This template demonstrates how to build an AI coding assistant that can work wit
 ## Prerequisites
 
 - Node.js 22.13.0 or later
-- API key for your chosen sandbox provider ([Daytona](https://www.daytona.io/) or [E2B](https://e2b.dev))
+- API key for your chosen sandbox provider ([Daytona](https://www.daytona.io/), [E2B](https://e2b.dev), or [Leap0](https://leap0.dev))
 - API key for your chosen model provider
 
 ## Setup
@@ -48,6 +48,8 @@ This template demonstrates how to build an AI coding assistant that can work wit
    # Option 2: Use E2B (set E2B_API_KEY)
    # E2B_API_KEY="your-e2b-api-key-here"
 
+   # Option 3: Use Leap0 (set LEAP0_API_KEY; see https://github.com/leap0-dev/leap0-js)
+   # LEAP0_API_KEY="your-leap0-api-key-here"
 
    # Model provider (required)
    OPENAI_API_KEY="your-openai-api-key-here"
@@ -94,7 +96,7 @@ Complete toolkit for sandbox interaction with support for multiple providers:
 
 **Provider Selection:**
 
-- Automatically uses **Daytona** or **E2B** based on which API key you set
+- Automatically uses **Daytona**, **E2B**, or **Leap0** based on which API key you set
 
 **Sandbox Management:**
 
@@ -149,6 +151,9 @@ DAYTONA_API_KEY=your_daytona_api_key_here
 # Option 2: E2B
 E2B_API_KEY=your_e2b_api_key_here
 
+# Option 3: Leap0
+LEAP0_API_KEY=your_leap0_api_key_here
+
 ```
 
 > [!Note]
@@ -179,10 +184,10 @@ export const codingAgent = new Agent({
 
 ## Common Issues
 
-### "Please set either DAYTONA_API_KEY or E2B_API_KEY environment variable"
+### "Please set either DAYTONA_API_KEY or E2B_API_KEY or LEAP0_API_KEY environment variable"
 
 - You need to configure a sandbox provider by setting one of the API keys
-- Add either `DAYTONA_API_KEY` or `E2B_API_KEY` to your `.env` file
+- Add either `DAYTONA_API_KEY` or `E2B_API_KEY` or `LEAP0_API_KEY` to your `.env` file
 - Only set ONE provider API key (not both)
 - Restart the development server after adding the key
 
@@ -222,5 +227,8 @@ src/mastra/
         daytona/
           tools.ts                   # Daytona sandbox implementation
           utils.ts                   # Daytona helper functions
+        leap0/
+          tools.ts                   # Leap0 sandbox implementation (leap0-js)
+          utils.ts                   # Leap0 client and path helpers
       index.ts                       # Mastra configuration with storage and logging
 ```
